@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper SYSTEM "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="mybatis00.test01.hello_origin_way.UserMapper">
+	<!--
+		查询测试： 
+		select#id：标识映射文件中的sql，称为一个statementId，最终会将sql语句封装到 MappedStatement 对象当中
+		parameterType：指定输入参数的类型
+		resultType：
+			指定单条结果记录所映射的java数据类型。除了映射pojo类型，resultType也可以类似parameterType映射简单类型。
+			注意：使用resultType映射输出结果类型，只有查出来的列名和属性名一致，该列才可以映射成功。
+			如果查询出来的列名和pojo中的属性名全部不一致，则就不创建pojo对象，
+			只要查询出来的列名有一个和pojo中的属性名一致，则就会创建pojo对象！
+		resultMap：映射高级输出类型，需要实现定义resultMap映射元信息。		
+		
+		
+		关于两种占位符的说明：
+		#{} 相当于一个占位符，以预编译的形式将参数设置到sql语句中，可防止SQL注入的问题
+		${} 用于字符拼接，是直接将传递的参数拼装在sql语句中
+		用法：
+		a. 大多情况下我们使用 #{} 进行参数传递
+		b. 如果需要动态查询则需要使用 ${} 进行取值( 如 select * from ${} )
+		其他说明：
+		#{}更丰富的用法(规定参数的一些规则)：
+		  javaType：java类型
+		  jdbcType：jdbc类型(参考 JDBCType枚举)，通常需要在特定情况下设置，
+		            因为有些数据库(oracle)不能识别 mybatis 对null的处理，
+		            默认情况下 mybatis 将null值作为 JDBCType#OTHER类型
+		            进行处理(全局配置 jdbcTypeForNull=OTHER)，要想在
+		            oracle中正常使用，可以设置参数时 #{xxx,jdbcType=NULL}
+		  mode：用于存储过程
+		  numericScale：数字类型小数位数
+		  resultMap：将返回数据封装成的复杂数据类型
+		  typeHandler：类型处理器
+		  jdbcTypeName
+		  expression
+				   
+		
+		Mybatis对映射参数的处理(ParamNameResolver):
+		1、单个参数
+			名称任意，直接 #{xxx}
+		
+		2、多个参数
+			多个参数会被封装成一个map，map的key为 param1..paramN，map的value为传入的参数值，
+			所以在映射sql取值的时候，应当使用 #{param1},..,#{paramN} 或者 #{0},..,#{N-1} 的方式
+		
+		3、多个参数使用命名参数(推荐)
+			首先定义mapper接口的时候，使用 @Param 注解定义参数的名称，然后就可以在mapper映射文件中使用自定义的参数名
+			a. Emp findEmpByIdAndName(@Param("id") Integer id, @Param("lastName") String lastName);
+			b. select * from t_emp where id=#{id} and last_name=#{lastName}
+		
+		4、多个参数是POJO的属性时可以使用POJO传递参数，取值时采用 #{属性名} 方式
+			有时为方便会专门封装TO（Transfer Object）对象用于传递参数(eg. Page)
+			a. void updateEmp(Emp emp);
+			b. update t_emp set last_name=#{lastName},email=#{email},gender=#{gender} where id=#{id}
+		
+		5、多个参数没有对应POJO时也可以使用map进行参数传递，取值时采用 #{map的key} 方式
+			a. Emp findEmpByIdAndName(Map map);
+			b. select * from t_emp where id=#{id} and last_name=#{lastName}
+		
+		6、如果参数是集合或数组，Mybatis也会把集合或数组封装在map中，map的key即为集合或者数组对象。
+			如果是List类型的参数还可以使用 "list" 作为取值的键，如果是数组则还可以使用 "array" 作为取值的键
+			
+		
+		mybatis两个内置映射参数:
+		_parameter: 代表整个参数。如果是多个参数，则多个参数会被封装成为一个map，_parameter就代表这个map。
+		_databaseId: 如果配置了databaseProvider标签，则_databaseId就是代表当前数据库的别名。
+	 -->
+	<select id="findUserById" parameterType="int" resultType="mybatis00.test01.hello_origin_way.User">
+		select * from t_user where id=#{id}
+	</select>
+	<select id="findUserByNameLike" parameterType="java.lang.String" resultType="mybatis00.test01.hello_origin_way.User">
+		<!-- select * from t_user where name like concat('%', #{name}, '%') -->
+		select * from t_user where name like '%${value}%'
+	</select>
+	<select id="countUser" resultType="int">
+		select count(1) from t_user
+	</select>
+	
+	
+	<!-- 
+		插入测试：
+		mybatis底层调用Statement#getGeneratedKeys 获取生成的主键并赋值给封装对象的某个属性 
+	-->
+	<insert id="insertUser1" databaseId="mysql" useGeneratedKeys="true" keyProperty="id">
+		insert into t_user(name, age, birthday) values(#{name}, #{age}, #{birthday})
+	</insert>
+	<insert id="insertUser2" databaseId="mysql">
+		<selectKey keyProperty="id" order="AFTER" resultType="int">
+			select last_insert_id()
+		</selectKey>
+		insert into t_user(name, age, birthday) values(#{name}, #{age}, #{birthday})
+	</insert>
+	<insert id="insertUser1" databaseId="oracle">
+		<selectKey keyProperty="id" resultType="integer" order="BEFORE">
+			select user_seq.nextval from dual
+		</selectKey>
+		insert into t_user(id,name,age,birthday) values(user_seq.currentval,#{name}, #{age}, #{birthday})
+	</insert>
+	<insert id="insertUser2" databaseId="oracle">
+		<selectKey keyProperty="id" resultType="integer" order="AFTER">
+			select user_seq.currentval from dual
+		</selectKey>
+		insert into t_user(id,name,age,birthday) values(user_seq.nextval,#{name}, #{age}, #{birthday})
+	</insert>
+	
+	
+	<!-- 
+		更新测试：
+	-->
+	<update id="updateUser">
+		update t_user set name=#{name}, age=#{age}, birthday=#{birthday} where id=#{id}
+	</update> 
+	
+	
+	<!-- 
+		测试删除
+	-->
+	<delete id="deleteUser">
+		delete from t_user where id=#{id}
+	</delete>
+</mapper>

@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration SYSTEM "http://mybatis.org/dtd/mybatis-3-config.dtd" >
+
+<configuration>
+	<!-- 
+		加载外部配置参数：
+		注意mybatis将会按照以下顺序来加载运行时属性：
+		1. 在properties元素体内定义的属性首先被加载
+		2. 然后读取properties元素中resource和url加载的属性，他会覆盖已读取的同名属性
+		3. 最后读取parameterType传递的属性，它会覆盖已读取的同名属性
+		因此，通过parameterType传递的属性具有最高的优先级，resource或url加载的属性次之，
+		properties元素体内定义的属性优先级最低。
+		建议不要在properties元素体内添加任何属性，并且在properties配置文件中定义的属性要有一定的特殊性。
+	-->
+	<properties resource="/mybatis00/test01/hello_origin_way/jdbc.properties">
+		<!-- properties元素体内还可以添加一些属性 -->
+	</properties>
+	
+	
+	<!-- 
+		配置全局配置参数：
+		mybatis默认预定义的setting参见：
+		org.apache.ibatis.builder.xml.XMLConfigBuilder#settingsElement
+	-->
+	<settings>
+		<!-- 
+			配置一些全局参数，比如开启二级缓存、开启延迟加载等等。
+			参见：http://www.mybatis.org/mybatis-3/configuration.html#settings
+		-->
+		<setting name="cacheEnabled" value="true"/>
+	</settings>
+	
+	
+	<!-- 
+		别名管理器：
+		针对parameterType或resultType所指定的类型定义一些别名，在mapper.xml中通过别名定义
+		parameterType或resultType所指定的类型，方便开发。
+		mybatis预定义的typeAlias参见：org.apache.ibatis.type.TypeAliasRegistry
+	-->
+	<typeAliases>
+		<!-- 定义单个类型的别名 -->
+		<!-- <typeAlias type="mybatis01.hello.User" alias="user"/> -->	
+		<!-- 批量别名的定义: 被扫描包下的类的别名就是 类的非全限名（大小写不敏感） -->
+		<!-- <package name="mybatis01.hello"/> -->
+	</typeAliases>
+	
+	
+	<!-- 
+		类型处理器：
+		mybatis通过typeHandlers完成对jdbc和java数据类型的转换，
+		通常情况下，mybatis默认提供的类型处理器就满足我们日常的需要，不需要我们自定义。
+		mybatis预定义的typeHandlers参见：org.apache.ibatis.type.TypeHandlerRegistry 
+		你可以重写类型处理器或创建你自己的类型处理器来处理不支持的或非标准的类型。
+	 	具体做法为: 实现 org.apache.ibatis.type.TypeHandler 接口，或继承一个很便利的类 
+		org.apache.ibatis.type.BaseTypeHandler，然后可以选择性地将它映射到一个 JDBC 类型。
+	-->
+	<typeHandlers>
+	 	<!-- <typeHandler handler="" javaType="" jdbcType=""/> -->
+	</typeHandlers>
+	
+	
+	<!-- object工厂 -->
+	<!-- 
+	<objectFactory type=""></objectFactory>
+	-->
+	
+	
+	<!-- 
+		插件管理器：
+		MyBatis允许你在已映射语句执行过程中的某一点进行拦截调用（实际还是代理）。
+		默认情况下，MyBatis允许使用插件来拦截的方法调用包括：
+		Executor (update, query, flushStatements, commit, rollback, 
+	               getTransaction, close, isClosed)
+		ParameterHandler (getParameterObject, setParameters)
+		ResultSetHandler (handleResultSets, handleOutputParameters)
+		StatementHandler (prepare, parameterize, batch, update, query)
+		使用插件是非常简单的，只需实现 Interceptor 接口，并指定想要拦截的方法签名即可。
+  		使用插件需要很小心，因为如果在试图修改或重写已有方法的行为的时候，你很可能会修改MyBatis的核心模块。
+	-->
+	<!-- 
+	<plugins>
+		<plugin interceptor="org.mybatis.example.ExamplePlugin">
+			<property name="someProperty" value="100"/>
+		</plugin>
+	</plugins>
+	-->
+
+	
+	<!-- 
+	 environments:
+	 1、可以配置多个environment，但创建SessionFactory的时候只能选择其一。
+	 2、每个environment标签下必须包含 transactionManager 和 dataSource 两个子标签。
+	 3、事务管理器transactionManager的可选值有 JDBC|MANAGED。
+	    JDBC: 这个配置就是直接使用了 JDBC 的提交和回滚设置，它依赖于从数据源得到的连接来管理事务作用域。
+	    MANAGED: 这个配置几乎没做什么。它从来不提交或回滚一个连接，而是让容器来管理事务的整个生命周期（
+	    比如 JEE 应用服务器的上下文）。默认情况下它会关闭连接，然而一些容器并不希望这样，因此需要使用其下
+	    property子标签将closeConnection 属性设置为false来阻止它默认的关闭行为。
+	    其实这两个可选值它们是类型别名（参照 org.apache.ibatis.session.Configuration），换句话说，
+	    通过实现 TransactionFactory接口 可以自定义事务，
+        并使用实现类的完全限定名或类型别名代替 JDBC|MANAGED。
+	    注意：如果你正在使用 Spring + MyBatis，则没有必要配置事务管理器，
+	         因为Spring模块会使用自带的管理器来覆盖前面的配置。
+	 4、数据源dataSource的可选值有 UNPOOLED|POOLED|JNDI。
+	    通过实现 DataSourceFactory接口 可以设置自定义的数据源（eg. c3p0、druid等）
+	-->
+	<environments default="development">
+		<environment id="development">
+			<transactionManager type="JDBC"></transactionManager>
+			<dataSource type="POOLED">
+				<property name="driver" value="${jdbc.driver}" />
+				<property name="url" value="${jdbc.url}" />
+				<property name="username" value="${jdbc.username}" />
+				<property name="password" value="${jdbc.password}" />
+			</dataSource>
+		</environment>
+	</environments>
+	
+	
+	<!-- 
+	databaseIdProvider:
+	Mybatis对多数据库厂商的支持，方法如下：
+	1、定义数据库厂商标识的别名：多数据库厂商支持，作用就是根据数据库厂商的标识。驱动包实现方法
+	  DatabaseMetaData#getDatabaseProductName可以获取厂商标识。由于通常情况下这个字符串
+	  都非常长而且相同产品的不同版本会返回不同的值，所以最好通过设置属性别名来使其变短。
+	2、设置具体sql语句相关标签的databaseId属性为当前数据库厂商标识别名，如：
+	  <select id="getEmpById" resultType="emp" databaseId="mysql">xxx<select>
+	3、配置相应数据库的 environment，并设置为默认环境。
+	-->
+	<databaseIdProvider type="DB_VENDOR">
+		<property name="MySQL" value="mysql"/>
+	  	<property name="Oracle" value="oracle" />
+		<property name="SQL Server" value="sqlserver"/>
+	  	<property name="DB2" value="db2"/>    
+	</databaseIdProvider>
+	
+	
+	<!-- 
+	 mappers:
+	 1、使用映射文件映射SQL(推荐)
+		 将SQL映射注册到全局配置中。
+		 resource：引用类路径下的sql映射文件
+		 url：引用网络路径下的sql映射文件
+		 package：用于批量注册，要求mapper映射文件(如果有)和mapper接口必须在同一个包下，并且名称相同。
+		 class：a、引用mapper接口，如果使用class注册mapper接口，那么mapper
+		          映射文件必须和mapper接口在同一个目录下，并且具有相同的名称。
+		        b、class标签也可以直接注册使用注解映射SQL的mapper接口。
+	 2、使用注解映射SQL
+	 	在这种情况下，所有的SQL都是使用注解写在接口上，并且使用class标签将接口注册进来。
+	-->
+	<mappers>
+		<mapper resource="/mybatis00/test01/hello_origin_way/UserMapper.xml" />
+		<!-- 
+		<package name="test01.hello_origin_way"/>
+		<mapper class="test01.hello_origin_way.UserMapper"/>
+		-->
+	</mappers>
+</configuration>

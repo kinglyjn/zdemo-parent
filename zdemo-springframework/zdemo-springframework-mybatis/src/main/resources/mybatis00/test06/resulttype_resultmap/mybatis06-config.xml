@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration SYSTEM "http://mybatis.org/dtd/mybatis-3-config.dtd" >
+
+<configuration>
+	<!-- 引入外部配置文件 -->
+	<properties resource="/mybatis00/test06/resulttype_resultmap/jdbc.properties"></properties>
+	
+	<!-- 配置全局参数 -->
+	<!--  
+		由于mybatis首先要加载全局配置参数而后运行时加载mapper映射文件，
+		因此全局配置参数的优先级比mapper映射文件的，如果在mapper映射
+		文件中配置了fetchType="lazy"属性，无论全局参数的延迟加载如何配置，
+		mybatis都会对相应的属性进行懒加载。
+	-->
+	<settings>
+		<setting name="cacheEnabled" value="true"/>
+		<setting name="lazyLoadingEnabled" value="true"/>  
+		<setting name="aggressiveLazyLoading" value="false"/>
+		<setting name="mapUnderscoreToCamelCase" value="true"/>
+	</settings>
+	
+	<!-- 别名管理器 -->
+	<typeAliases>
+		<package name="mybatis00.test06.resulttype_resultmap"/>
+	</typeAliases>
+	
+	<!-- 连接参数配置 -->
+	<environments default="development">
+		<environment id="development">
+			<transactionManager type="JDBC"></transactionManager>
+			<dataSource type="POOLED">
+				<property name="driver" value="${jdbc.driver}" />
+				<property name="url" value="${jdbc.url}" />
+				<property name="username" value="${jdbc.username}" />
+				<property name="password" value="${jdbc.password}" />
+			</dataSource>
+		</environment>
+	</environments>
+	
+	<!-- 数据库厂商配置 -->
+	<databaseIdProvider type="DB_VENDOR">
+		<property name="MySQL" value="mysql"/>
+	  	<property name="Oracle" value="oracle" />
+		<property name="SQL Server" value="sqlserver"/>
+	  	<property name="DB2" value="db2"/>
+	</databaseIdProvider>
+	
+	<!-- 映射文件配置 -->
+	<mappers>
+		<package name="mybatis00.test06.resulttype_resultmap"/>
+	</mappers>
+</configuration>

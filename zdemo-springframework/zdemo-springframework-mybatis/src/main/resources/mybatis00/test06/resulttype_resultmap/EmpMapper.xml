@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper SYSTEM "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="mybatis00.test06.resulttype_resultmap.EmpMapper">
+	
+	<select id="findEmpsByDeptId" resultType="emp">
+		select * from t_emp where dept_id=#{deptId}
+	</select>
+	
+	
+	<!-- 
+	##############
+	resultType测试 
+	##############
+	-->
+	
+	<!-- 1、返回集合list，resultType则为返回list元素的类型 -->
+	<select id="findEmpByLastnameLike" resultType="emp">
+	    select * from t_emp where last_name like #{lastName}
+	</select>
+	
+	<!-- 2、返回集合map（键为数据库字段类型，值为数据库字段值），resultType 则为 map -->
+	<select id="findEmpByIdWithReturnedMap" resultType="map">
+		select * from t_emp where id=#{id}
+	</select>
+	
+	<!-- 3、返回集合map（键为数据库表主键值，值为主键对应记录）-->
+	<select id="findEmpByIdWithReturnedMap2" resultType="emp">
+		select * from t_emp
+	</select>
+	
+	
+	
+	<!-- 
+	##############
+	resultMap测试 
+	##############
+	-->
+	
+	<!-- 
+		一般的resultMap测试：
+		resultMap支持继承，使用resultMap的extends属性指定继承的映射resultMap#Id即可 
+	-->
+	<resultMap type="emp" id="EmpWithDept">
+		<!-- 主键映射规则 -->
+		<id column="id" property="id"/>
+		<!-- 普通属性映射规则 -->
+		<result column="last_name" property="lastName"/>
+		<result column="email" property="email"/>
+		<result column="gender" property="gender"/>
+		<!-- 级联属性映射规则 -->
+		<result column="did" property="dept.id"/>
+		<result column="dept_name" property="dept.deptName"/>
+		<!-- 或者也可以按照以下方式映射 -->
+		<!--  
+		<association property="dept" javaType="test06.resulttype_resultmap.Dept">
+			<id column="did" property="id"/>
+			<result column="dept_name" property="deptName"/>
+		</association>
+		-->
+	</resultMap>
+	<select id="findEmpWithDeptByEmpId" resultMap="EmpWithDept">
+		select e.*, d.id as did, d.dept_name from t_emp e left join t_dept d on e.dept_id=d.id where e.id=#{id}
+	</select>
+	
+	
+	<!-- 
+		resultMap鉴别器测试：
+		实现当查询的员工是女生时，查询并封装dept属性
+		当查询的员工是男生时，不查询dept属性，并且将查询的 email赋值给last_name	
+	-->
+	<resultMap type="emp" id="EmpWithDept2">
+		<id column="id" property="id"/>
+		<result column="last_name" property="lastName"/>
+		<result column="email" property="email"/>
+		<result column="gender" property="gender"/>
+		<!-- 鉴别器 -->
+		<discriminator javaType="string" column="gender">
+			<case value="0" resultType="emp">
+				<association property="dept" javaType="dept">
+					<id column="did" property="id"/>
+					<result column="dept_name" property="deptName"/>
+				</association>
+			</case>
+			<case value="1" resultMap="emp">
+				<result column="email" property="lastName"/>
+			</case>
+		</discriminator>
+	</resultMap>
+	<select id="findAllEmpWithDept" resultMap="EmpWithDept2">
+		select e.*, d.id as did, d.dept_name from t_emp e left join t_dept d on e.dept_id=d.id
+	</select>
+	
+	
+	
+	<!-- 
+	##############
+	分步查询和懒加载
+	##############
+	-->
+	
+	<!--  
+	使用分步查询可以实现多表查询，更好的是你还可以使用分步查询的延迟加载功能！
+	如果使用分布查询的延迟加载功能，只需要在全局设置中增加如下两个配置：（开启延迟加载 和 延迟加载属性按需查询）
+	<setting name="lazyLoadingEnabled" value="true"/>
+	<setting name="aggressiveLazyLoading" value="false"/> 
+	懒加载时，只有用到主数据时，才会查询关联数据，那么这个 “用到” 是什么意思？
+	eager: query主数据时，会立刻query关联数据，这两个query使用的同一个jdbc connection
+	lazy: query主数据库时，不会query关联数据，只有在调用主数据toString方法或获取关联属性时，才会query获取数据，这两个query使用不同connection。
+	-->
+	
+	<resultMap type="emp" id="EmpWithDeptStepMode">
+		<id column="id" property="id"/>
+		<result column="last_name" property="lastName"/>
+		<result column="email" property="email"/>
+		<result column="gender" property="gender"/>
+		<!-- column map key是dept#getDeptById中传递参数#{deptId}的名字，
+		column map value是查出的t_emp表的关联字段dept_id -->
+		<association property="dept" 
+			select="test06.resulttype_resultmap.DeptMapper.findDeptById" 
+			column="{deptId=dept_id}"
+			fetchType="lazy"/>
+	</resultMap>
+	<select id="findEmpByIdReturnedEmpWithDeptStepMode" resultMap="EmpWithDeptStepMode">
+		select * from t_emp where id=#{id}
+	</select>
+	
+</mapper>

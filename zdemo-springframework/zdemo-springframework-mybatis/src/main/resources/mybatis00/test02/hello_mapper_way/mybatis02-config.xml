@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration SYSTEM "http://mybatis.org/dtd/mybatis-3-config.dtd" >
+
+<configuration>
+	<!-- 引入外部配置文件 -->
+	<properties resource="/mybatis00/test02/hello_mapper_way/jdbc.properties">
+		<!-- properties元素体内还可以添加一些属性 -->
+	</properties>
+	
+	
+	<!-- 全局配置参数 -->
+	<settings>
+		<setting name="cacheEnabled" value="true"/>
+	</settings>
+	
+	
+	<!-- 别名管理器 -->
+	<typeAliases>
+		<!-- <typeAlias type="mybatis00.test02.hello_mapper_way.User" alias="user"/> -->
+		<!-- <package name="mybatis00.test02.hello_mapper_way"/> -->
+	</typeAliases>
+	
+	
+	<!-- 类型处理器 -->
+	<typeHandlers>
+	 	<!-- <typeHandler handler="" javaType="" jdbcType=""/> -->
+	</typeHandlers>
+	
+	
+	<!-- 连接环境配置 -->
+	<environments default="development">
+		<environment id="development">
+			<transactionManager type="JDBC"></transactionManager>
+			<dataSource type="POOLED">
+				<property name="driver" value="${jdbc.driver}" />
+				<property name="url" value="${jdbc.url}" />
+				<property name="username" value="${jdbc.username}" />
+				<property name="password" value="${jdbc.password}" />
+			</dataSource>
+		</environment>
+	</environments>
+	
+	
+	<!-- 数据库厂商配置 -->
+	<databaseIdProvider type="DB_VENDOR">
+		<property name="MySQL" value="mysql"/>
+	  	<property name="Oracle" value="oracle" />
+		<property name="SQL Server" value="sqlserver"/>
+	  	<property name="DB2" value="db2"/>    
+	</databaseIdProvider>
+	
+	
+	<!-- 映射文件配置 -->
+	<mappers>
+		<package name="mybatis00.test02.hello_mapper_way"/>
+		<!--
+		<mapper resource="mybatis00/test02/hello_mapper_way/UserMapper.xml" />
+		<mapper class="mybatis00.test02.hello_mapper_way.UserMapper"/>
+		-->
+	</mappers>
+</configuration>

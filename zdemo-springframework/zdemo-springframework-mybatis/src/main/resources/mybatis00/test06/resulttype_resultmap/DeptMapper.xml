@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper SYSTEM "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="mybatis00.test06.resulttype_resultmap.DeptMapper">
+	<select id="findDeptById" resultType="dept">
+		select * from t_dept where id=#{deptId}
+	</select>
+	
+	
+	<resultMap type="dept" id="DeptWithEmpStepMode">
+		<id column="id" property="id"/>
+		<result column="dept_name" property="deptName"/>
+		<collection property="emps" 
+			select="test06.resulttype_resultmap.EmpMapper.findEmpsByDeptId" 
+			column="{deptId=id}"
+			fetchType="lazy"/>
+	</resultMap>
+	<select id="findDeptByIdReturnedDeptWithEmpStepMode" resultMap="DeptWithEmpStepMode">
+		select id,dept_name from t_dept where id=#{id}
+	</select>
+</mapper>

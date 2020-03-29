@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper SYSTEM "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="mybatis00.test07.first_second_cache.UserMapper">
+	<!--  
+	一级缓存：
+	也叫本地缓存或session缓存，是指与数据库同一次会话期间查询到的数据会放入一级缓存中，以后查询相同
+	的数据直接从缓存中取，没必要再从数据库中查询得到。一级缓存是一直开启的（session缓存没法关闭）。
+    1、不同session的缓存不共用
+    2、同一个session，两次查询之间插入、更新或删除了数据，则session缓存失效
+    3、同一个session，调用 session#clearCache(清1级缓存) 或 session#commit，session缓存失效
+	
+	二级缓存：
+	也叫全局缓存或namespace缓存，一个namespace对应一个二级缓存。
+	1、session查询一条记录，这条记录就会被放在一级缓存中；
+    2、如果当前会话关闭，则以及缓存中的数据就会被保存在二级缓存中，新的会话就会参照二级缓存查询数据；
+    3、同一个session使用不同namespace mapper 查询的的记录会放在不同的namespace#map缓存中
+		
+		client->CachingExcutor->Excutor->db
+		             |             |
+		       SecondryCache    LocalCache
+		       
+	默认每次增删改操作清除全部一级和二级缓存，缓存的定时刷新可以通过 cache标签的flushInterval设置。
+	最后，请注意：
+	1、查出的数据会先放在一级缓存中，只有当会话提交或关闭之后，一级缓存中的数据才会转移到二级缓存中。
+	2、我们在实际开发中应该尽量避免使用文集缓存，因为二级缓存是基于namespace的，尤其当同一个mapper
+	  可能还要操作其他表的数据，当使用其他mapper查询时很可能会造成其缓存和数据库数据不一致的问题！
+	3、mybatis二级缓存对细粒度数据级别的缓存实现不好，比如如下要求：对商品信息进行缓存，由于商品信息
+	  查询访问量大，但是要求用户每次都能查询出最新的商品数据，此时如果在使用mybatis的二级缓存就无法
+	  实现当一个商品变化时只刷新该商品的缓存信息而不刷新其他商品的信息，因为mybatis的二级缓存区域以
+	  mapper为单位划分，当一个商品变化会将所有商品的缓存数据清空。解决此类问题需要在业务层根据需求对
+	  数据有针对性地进行缓存。最后还是建议，放弃二级缓存，在业务层使用可控制的缓存代替更好。
+	-->
+	
+	
+	<!--
+	1、开启全局二级缓存配置项：
+		<setting name="cacheEnabled" value="true"/>
+	2、在每个 namespace mapper 中配置使用二级缓存
+		<cache></cache>
+		eviction: 缓存的回收策略，LRU(默认)、FIFO、SOFT、WEAK
+		flushInterval: 缓存多长时间(ms)清空一次(默认不清空)
+		readOnly: 默认为true。如果是只读为true，mybatis认为所有从缓存中获取的数据的操作都是只读操作，
+				  不会修改数据，查询直接就会将数据在缓存中交给用户，速度快但不安全；如果只读为false，
+				  mybatis就会利用序列化和反序列化技术克隆一份新的数据给你。速度稍慢但安全。
+		size: 缓存大小，默认为1024
+		type: 指定自定义缓存的全类名(实现 org.apache.ibatis.cache.Cache 接口)
+	3、PO需要实现序列化接口
+	4、在另外一个namespace中使用 <cache-ref namespace="test06.resulttype_resultmap.EmpMapper"/> 标签共享其他空间缓存  
+	-->
+	<cache type="org.mybatis.caches.ehcache.EhcacheCache">
+		<!--  
+		<property name="timeToIdleSeconds" value="3600"/>
+        <property name="timeToLiveSeconds" value="3600"/>
+        <property name="maxEntriesLocalHeap" value="1000"/>
+        <property name="maxEntriesLocalDisk" value="10000000"/>
+        <property name="memoryStoreEvictionPolicy" value="LRU"/>
+        -->
+	</cache>
+	
+	<!--查询使用二级缓存-->
+	<select id="findUserById" resultType="user" useCache="true">
+		select * from t_user where id=#{id}
+	</select>
+
+	<!-- 查询刷新缓存 -->
+	<update id="updateUser" flushCache="true">
+		update t_user 
+		<set>
+			<if test="name!=null">
+				name=#{name},
+			</if>
+			<if test="age!=0">
+				age=#{age},
+			</if>
+			<if test="birthday!=null">
+				birthday=#{birthday}
+			</if>
+		</set>
+		<where>
+			id=#{id}
+		</where>
+	</update>
+</mapper>

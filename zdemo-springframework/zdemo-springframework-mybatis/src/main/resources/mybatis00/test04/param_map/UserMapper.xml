@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper SYSTEM "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="mybatis00.test04.param_map.UserMapper">
+	
+	<!-- 
+	1、单个参数
+	名称任意，直接 #{xxx}
+	-->
+	<select id="findUserById" resultType="user">
+		select * from t_user where id=#{id}
+	</select>
+	
+	
+	<!-- 
+	2、多个参数
+	多个参数会被封装成一个map，map的key为 param1..paramN，map的value为传入的参数值，
+	所以在映射sql取值的时候，应当使用 #{param1},..,#{paramN} 或者 #{0},..,#{N-1} 的方式
+	-->
+	<select id="findUserByNameLikeAndAgeBetween" resultType="user">
+		select * from t_user where name like #{param1} and age between #{param2} and #{param3} 
+		<!-- select * from t_user where name like #{0} and age between #{1} and #{2} -->
+	</select>
+	
+	
+	<!-- 
+	3、多个参数使用命名参数(推荐)
+	首先定义mapper接口的时候，使用 @Param 注解定义参数的名称，然后就可以在mapper映射文件中使用自定义的参数名
+	a. Emp findEmpByIdAndName(@Param("id") Integer id, @Param("lastName") String lastName);
+	b. select * from t_emp where id=#{id} and last_name=#{lastName}
+	-->
+	<select id="findUserByNameLikeAndBirthdayBetween" resultType="user">
+		select * from t_user where name like #{name} and birthday between #{minDate} and #{maxDate} 
+	</select>
+	
+	
+	<!-- 
+	4、多个参数是POJO的属性时可以使用POJO传递参数，取值时采用 #{属性名} 方式
+	有时为方便会专门封装TO（Transfer Object）对象用于传递参数(eg. Page)
+	a. void updateEmp(Emp emp);
+	b. update t_emp set last_name=#{lastName},email=#{email},gender=#{gender} where id=#{id}
+	-->
+	<update id="updateUser">
+		update t_user set name=#{name}, age=#{age}, birthday=#{birthday} where id=#{id}
+	</update>
+	
+	
+	<!--  
+	5、多个参数没有对应POJO时也可以使用map进行参数传递，取值时采用 #{map的key} 方式
+	a. Emp findEmpByIdAndName(Map map);
+	b. select * from t_emp where id=#{id} and last_name=#{lastName}
+	-->
+	<select id="findUserByMap1" resultType="user">
+		select * from t_user where name=#{name} and age=#{age}
+	</select>
+	
+	
+	<!--  
+	6、如果参数是集合或数组，Mybatis也会把集合或数组封装在map中，map的key即为集合或者数组对象。集合可以使用 "collection" 作为取值的key。
+	如果是List类型的参数还可以使用 "list" 作为取值的键，如果是数组则还可以使用 "array" 作为取值的键
+	-->
+	<select id="findUserByIdSet" resultType="user">
+		select * from t_user where id in
+		<foreach collection="collection" item="id" open="(" close=")" separator=",">
+			#{id}
+		</foreach>	
+	</select>
+	<select id="findUserByIdListFirst" resultType="user">
+		select * from t_user where id=#{list[0]}
+	</select>
+	<select id="findUserByIdArrayFirst" resultType="user">
+		select * from t_user where id=#{array[0]}
+	</select>
+	<select id="findUserByIdAndUserVo" resultType="user">
+		select * from t_user where id=#{param1} and name=#{user.name}
+	</select>
+	
+	
+	<!--  
+	7、两个内置映射参数
+	_parameter: 代表整个参数。如果是多个参数，则多个参数会被封装成为一个map，_parameter就代表这个map。
+	_databaseId: 如果配置了databaseProvider标签，则_databaseId就是代表当前数据库的别名。
+	-->
+	<select id="findUserByParameterAndDatabaseId" resultType="user">
+		<if test="_databaseId=='mysql'">
+			select * from t_user
+			<if test="_parameter!=null">
+				where name=#{name}
+			</if>
+		</if>
+		<if test="_databaseId=='oracle'">
+			select * from t_user
+		</if>
+	</select>
+</mapper>

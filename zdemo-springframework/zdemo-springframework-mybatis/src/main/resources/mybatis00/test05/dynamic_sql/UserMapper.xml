@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper SYSTEM "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="mybatis00.test05.dynamic_sql.EmpMapper">
+	
+	<!-- 条件判断 -->
+	<select id="getEmpsByConditionIf1" resultType="test05.dynamic_sql.Emp">
+		select * from t_emp 
+		<where>
+			<!-- OGNL表达式 -->
+			<if test="id!=null"> 
+				id=#{id}
+			</if> 
+			<if test="lastName!=null and lastName!=''"> 
+				and last_name like #{lastName} 
+			</if>
+			<if test="email!=null and email.trim()!=&quot;&quot;"> 
+				and email like #{email} 
+			</if>
+			<if test="gender==0 or gender==1">
+				and gender=#{gender}
+			</if>
+		</where>
+	</select>
+	<select id="getEmpsByConditionIf2" resultType="test05.dynamic_sql.Emp">
+		select * from t_emp 
+		<trim prefix="where" suffixOverrides="and">
+			<!-- OGNL表达式 -->
+			<if test="id!=null"> 
+				id=#{id} and
+			</if> 
+			<if test="lastName!=null and lastName!=''"> 
+				last_name like #{lastName} and
+			</if>
+			<if test="email!=null and email.trim()!=&quot;&quot;"> 
+				email like #{email} and 
+			</if>
+			<if test="gender==0 or gender==1">
+				gender=#{gender}
+			</if>
+		</trim>
+	</select>
+	
+	
+	<!-- 分支选择 -->
+	<select id="getEmpsByConditionChoose1" resultType="test05.dynamic_sql.Emp">
+		select * from t_emp 
+		<where>
+			<choose>
+				<when test="lastName!=null">
+					last_name=#{lastName}
+				</when>
+				<when test="email!=null">
+					email=#{email}
+				</when>
+				<otherwise>
+					1=0
+				</otherwise>
+			</choose>
+		</where>
+	</select>
+	
+	
+	<!-- 更新标签 -->
+	<update id="updateEmp">
+		update t_emp 
+		<set> 
+			<if test="lastName!=null">
+				last_name=#{lastName},
+			</if>
+			<if test="email!=null">
+				email=#{email},
+			</if>
+			<if test="gender==1 or gender==0">
+				gender=#{gender}
+			</if>
+		</set>
+		where id=#{id}
+	</update>
+	
+	
+	<!-- 遍历标签 -->
+	<!-- List<Emp> getEmpsByConditionForeach(@Param("ids") List<Integer> ids); -->
+	<select id="getEmpsByConditionForeach" resultType="test05.dynamic_sql.Emp">
+		select * from t_emp where id in
+		<!-- index：遍历list的时候是索引，遍历map的时候index是map.key，item是遍历的map的值 -->
+		<foreach collection="ids" item="item" index="index" separator="," open="(" close=")">
+			#{item}
+		</foreach>
+	</select>
+	
+	<!-- void addEmps(@Param("emps") List<Emp> emps); -->
+	<!--
+	| id | last_name | email               | gender | dept_id |
+	| 10 | tianqi    | tianqi@keyllo.com   | 1      |    NULL |
+	| 11 | zhouba    | zhouba@keyllo.com   | 1      |    NULL |
+	-->
+	<insert id="addEmps" useGeneratedKeys="true" keyProperty="id">
+		insert into t_emp(last_name, email, gender, dept_id)
+		values
+		<foreach collection="list" item="emp" index="index" separator=",">
+			(#{emp.lastName}, #{emp.email}, #{emp.gender}, #{emp.dept.id})
+		</foreach>
+	</insert>
+	
+	<!-- Oracle批量插入方式一 -->
+	<insert id="addEmps2" databaseId="oracle">
+		<foreach collection="list" item="emp" open="begin" close="end;">
+			insert into t_emp(id,last_name,email) 
+	      		values(emp_seq.nextval, #{emp.lastName}, #{emp.email});
+		</foreach>
+	</insert>
+	<!-- Oracle批量插入方式二 -->
+	<insert id="addEmps3" databaseId="oracle">
+		insert into t_emp(id,last_name,email)
+			select emp.nextval,last_name,email from
+			<foreach collection="list" item="emp" separator="union" open="(" close=")">
+				select #{emp.lastName} as last_name, #{emp.email} as email from dual
+			</foreach>
+	</insert>
+	
+	
+	<!-- 将OGNL表达式中的值绑定到一个变量中，方便后面引用这个变量的值 -->
+	<select id="getEmpsByBind" resultType="test05.dynamic_sql.Emp">
+		<bind name="_lastName" value="'%'+ lastName +'%'"/> 
+		select * from t_emp where last_name like #{_lastName} 
+	</select>
+	
+	
+	<!-- 
+		使用sql标签抽取可重用的sql标签，方便引用
+		在sql标签中使用include中自定义的属性，取值方式是 ${xxx}
+	-->
+	<sql id="selectColumns">
+		<if test="_databaseId=='mysql'">
+			id,last_name,email,gender,${testProperty}
+		</if>
+		<if test="_databaseId=='oracle'">
+			id,last_name,email,gender
+		</if>
+	</sql>
+	<select id="getEmpsByBind" resultType="test05.dynamic_sql.Emp">
+		<bind name="_lastName" value="'%'+ lastName +'%'"/>
+		select 
+		<include refid="selectColumns">
+			<property name="testProperty" value="dept_id"/>
+		</include> 
+		from t_emp where last_name like #{_lastName}
+	</select>	
+</mapper>

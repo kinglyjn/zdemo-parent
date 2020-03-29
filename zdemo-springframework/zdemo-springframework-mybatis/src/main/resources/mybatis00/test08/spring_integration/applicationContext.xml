@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mybatis-spring="http://mybatis.org/schema/mybatis-spring"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring-1.2.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
+
+	<!-- 引入外部配置文件 -->
+	<context:property-placeholder location="/mybatis00/test08/spring_integration/jdbc.properties"/>
+	
+	<!-- 扫描组件包 -->
+	<context:component-scan base-package="mybatis00.test08.spring_integration"></context:component-scan>
+	
+	<!-- 数据源 -->
+   <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+		<property name="driverClassName">
+			<value>${jdbc.driver}</value>
+		</property>
+		<property name="url">
+			<value>${jdbc.url}</value>
+		</property>
+		<property name="username">
+			<value>${jdbc.username}</value>
+		</property>
+		<property name="password">
+			<value>${jdbc.password}</value>
+		</property>
+		<property name="initialSize" value="30" />
+		<property name="minIdle" value="5" />
+		<property name="maxActive" value="30" />
+		<property name="maxWait" value="60000" />
+		<property name="timeBetweenEvictionRunsMillis" value="60000" />
+		<property name="minEvictableIdleTimeMillis" value="300000" />
+		<property name="validationQuery" value="SELECT 'x'" />
+		<property name="testWhileIdle" value="true" />
+		<property name="testOnBorrow" value="false" />
+		<property name="testOnReturn" value="false" />
+		<property name="filters" value="stat" />
+	</bean>
+	
+	<!-- 事务管理器 -->
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"/>
+	</bean>
+	<tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true"/>
+	
+	<!--  
+	整合Mybatis：
+	1、让spring自动注入mapper
+	2、让spring自动管理事务
+	SqlSessionFactoryBean 实现了 spring FactoryBean接口，spring ioc容器启动即会创建SqlSessionFactory对象
+	-->
+	<bean id="sqlSessionFactoryBean" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"/>
+		<property name="configLocation" value="test08/spring_integration/mybatis08-config.xml"/>
+		<property name="mapperLocations" >
+			<list>
+				<value>classpath:/test08/spring_integration/*Mapper.xml</value>
+			</list>
+		</property>
+	</bean>
+	
+	<!-- Mybatis mapper代理开发方式，扫描所有mapper接口实现使被容器管理 -->
+	<mybatis-spring:scan base-package="test08.spring_integration"/>
+		
+	<!-- Mybatis 原始的开发方式 -->
+	<bean id="userDao" class="test08.spring_integration.UserDao">
+		<property name="sqlSessionFactory" ref="sqlSessionFactoryBean" />
+	</bean>	
+</beans>

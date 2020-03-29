@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper SYSTEM "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="mybatis00.test02.hello_mapper_way.UserMapper">
+
+	<!--
+	1、命名空间namespace必须与Mapper接口全类名相同
+	2、sql语句id必须与Mapper接口的方法名相同
+	说明：当使用package批量注册SQL映射文件时，则要求mapper映射
+	     文件(如果有)和mapper接口必须在同一个包下，并且名称相同
+	-->
+	<select id="findUserById" resultType="mybatis00.test02.hello_mapper_way.User">
+		select * from t_user where id=#{id}
+	</select>
+</mapper>
