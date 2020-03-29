@@ -47,7 +47,7 @@
         </dependency>
         <dependency>
             <groupId>org.aspectj</groupId>
-            <artifactId>aspectjrt</artifactId>
+            <artifactId>aspectjweaver</artifactId>
         </dependency>
 
         <!--web-->

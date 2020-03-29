@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
+
+	<!-- 引入外部配置参数 -->
+	<context:property-placeholder location="/jdbc.properties"/>
+
+	<!-- 配置扫描外部组件包 -->
+	<context:component-scan base-package="test08.integrate_hibernate"/>
+	
+	<!-- 装配数据源（druid）-->
+	<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+		<property name="driverClassName" value="${jdbc.driver}"/>
+		<property name="url" value="${jdbc.url}"/>
+		<property name="username" value="${jdbc.username}"/>
+		<property name="password" value="${jdbc.password}"/>
+		<property name="initialSize" value="3" />
+		<property name="minIdle" value="3" />
+		<property name="maxActive" value="10" />
+		<property name="maxWait" value="60000" />
+		<property name="useUnfairLock" value="false"/>
+		<property name="testWhileIdle" value="true" />
+		<property name="timeBetweenEvictionRunsMillis" value="60000" />
+		<property name="minEvictableIdleTimeMillis" value="300000" />
+		<property name="validationQuery" value="SELECT 'x'" />
+		<property name="testOnBorrow" value="false" />
+		<property name="testOnReturn" value="false" />
+		<property name="filters" value="stat" />
+	</bean>
+	
+	<!-- 装配hibernate sessionFactory -->
+	<!-- spring orm 使用LocalSessionFactoryBean装配hibernate的sessionFactory -->
+	<bean id="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+		<!-- 配置数据源 -->
+		<property name="dataSource" ref="dataSource"/>
+		
+		<!-- 
+			配置hibernate.cfg.xml信息的方式有两种：
+			方式一：将配置信息写在hibernate.cfg.xml文件中，将hibernate.cfg.xml文件路径注入给spring LocalSessionFactoryBean
+			方式二：直接将hibernate.cfg.xml配置信息注入给spring LocalSessionFactoryBean，这样就可以将hibernate.cfg.xml配置文件移除掉
+			选择哪一种配置方式，根据项目需要来定，个人建议采用方式一（这样起码可以使用hibernate插件）。
+		-->
+		<!-- 方式一： -->
+		<property name="configLocation" value="classpath:/test08/integrate_hibernate/hibernate.cfg.xml"/>
+		<!-- 方式二 -->
+		<!-- 
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+				<prop key="hibernate.show_sql">true</prop>
+				<prop key="hibernate.format_sql">true</prop>
+				<prop key="hibernate.hbm2ddl.auto">update</prop>
+			</props>
+		</property>
+		-->
+		 
+		<!-- 配置hibernate映射文件 -->
+		<property name="mappingLocations" value="classpath:/test08/integrate_hibernate/*.hbm.xml"/>
+	</bean>
+	
+	<!-- 装配Hibernate事务管理器 -->
+	<bean id="transactionManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	
+	
+	<!-- 配置公共事务属性 -->
+	<!-- 
+		spring+hibernate的事务流程：
+		1.在方法开始之前获取session，把session和当前的线程绑定，这样就可以在dao中使用
+		  sessionFactory.getCurrentSession()方法来获取session了
+		2.若方法正常结束，即没有出现异常，则会提交事务，使当前线程与session解除绑定，关闭session
+		3.若方法抛出异常，则回滚事务，使当前线程与session解除绑定，关闭session
+		[注意] hibernate的方法必须在spring事务的管理之下，否则获取不到session
+	 -->
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="sellBook" propagation="REQUIRES_NEW"/>
+			<tx:method name="get*" read-only="true"/>
+			<tx:method name="find*" read-only="true"/>
+			<tx:method name="*"/>
+		</tx:attributes>
+	</tx:advice>
+	
+	<!-- 给方法装配事务 -->
+	<aop:config>
+		<aop:pointcut id="txPointcut" expression="execution(* test08.integrate_hibernate.*.*(..))"/>
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="txPointcut"/>		
+	</aop:config>
+</beans>

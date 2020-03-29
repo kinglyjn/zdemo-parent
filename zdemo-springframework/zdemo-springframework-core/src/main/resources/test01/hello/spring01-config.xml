@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:util="http://www.springframework.org/schema/util"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xmlns:p="http://www.springframework.org/schema/p"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.3.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+
+	<!-- 引入外部配置参数 -->
+	<context:property-placeholder location="/jdbc.properties"/>
+	
+	<!-- 扫描组件包 -->
+	<context:component-scan base-package="test01.hello"></context:component-scan>
+
+	<!-- 定义公用集合和模板 -->
+	<util:list id="strArray">
+		<value>aaaa</value>
+		<value>bbbb</value>
+	</util:list>
+	<util:list id="nameList">
+		<value>张三</value>
+		<value>李四</value>
+		<value>小娟</value>
+	</util:list>
+	<util:set id="numSet">
+		<value>1</value>
+		<value>2</value>
+	</util:set>
+	<util:map id="myMap">
+		<entry key="key1" value="1"/>
+		<entry key="key2" value="2"/>
+		<entry key="key3" value="3"/>
+	</util:map>
+	<util:properties id="datasourceProperties">
+		<prop key="driver">${jdbc.driver}</prop>
+		<prop key="url"><![CDATA[${jdbc.url}]]></prop>
+		<prop key="username">${jdbc.username}</prop>
+		<prop key="password">${jdbc.password}</prop>
+	</util:properties>
+	<bean id="helloTemplate" class="test01.hello.Hello" p:num="12" p:set-ref="numSet" p:map-ref="myMap" abstract="true"/>
+	
+	
+	<!-- 指定IOC容器bean初始化处理器 -->
+	<bean class="test01.hello.HelloPostProcessor"/>
+	
+	
+	<!-- 定义具体的BEAN -->
+	<!-- hello1: P标签、使用集合和模板、单例和多例、引入外部参数 -->
+	<bean id="hello1" class="test01.hello.Hello" p:properties-ref="datasourceProperties" parent="helloTemplate" scope="singleton">
+		<constructor-arg name="num" value="11"/>
+		<constructor-arg name="str" value="${jdbc.url}"/>
+		<property name="doubleValue" value="1e-10"/>
+		<property name="strArray" ref="strArray"/>
+		<property name="list" ref="nameList"/>
+	</bean>
+	<!-- hello2: 初始化和销毁方法、BEAN懒加载、spring表达式 -->
+	<bean id="hello2" class="test01.hello.Hello" init-method="myInit" destroy-method="myDestroy" lazy-init="true">
+		<property name="num" value="#{1111}"/>
+		<property name="doubleValue" value="#{T(java.lang.Math).PI * 2}"/>
+		<property name="strArray" value="#{strArray}"></property>
+		<property name="str" value="#{strArray.size()>3 ? 'strArray的长度大于3' : 'strArray的长度不大于3'}"/>
+	</bean>	
+	<!-- hello3: 静态工厂生成hello -->
+	<bean id="hello3" class="test01.hello.HelloStaticFactory" factory-method="getInstance">
+		<constructor-arg name="num" value="3"/>
+	</bean>
+	<!-- hello4: 实例工厂生成hello -->
+	<bean id="helloFactory" class="test01.hello.HelloFactory" scope="singleton"/>
+	<bean id="hello4" factory-bean="helloFactory" factory-method="generateHello">
+		<constructor-arg name="num" value="4"/>
+	</bean>
+	<!-- hello5: 通过Spring自带的FactoryBean生成hello实例，注意返回的是Hello实例，而不是HelloFactoryBean -->
+	<bean id="hello5" class="test01.hello.HelloFactoryBean" p:num="5" p:str="haha"/>
+	
+	
+	<!-- 引入外部配置文件 -->
+	<!-- <import resource="classpath:beanss.xml"/> -->
+</beans>

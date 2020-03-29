@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa-1.8.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
+
+	<!-- 引入外部配置参数 -->
+	<context:property-placeholder location="classpath:/jdbc.properties" />
+	
+	<!--配置扫描组件包 -->
+	<context:component-scan base-package="test10.integrate_hibernate_springdata_jpa"/>
+	
+	<!-- 装配数据源（druid）-->
+	<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+		<property name="driverClassName" value="${jdbc.driver}"/>
+		<property name="url" value="${jdbc.url}"/>
+		<property name="username" value="${jdbc.username}"/>
+		<property name="password" value="${jdbc.password}"/>
+		<property name="initialSize" value="3" />
+		<property name="minIdle" value="3" />
+		<property name="maxActive" value="10" />
+		<property name="maxWait" value="60000" />
+		<property name="useUnfairLock" value="false"/>
+		<property name="testWhileIdle" value="true" />
+		<property name="timeBetweenEvictionRunsMillis" value="60000" />
+		<property name="minEvictableIdleTimeMillis" value="300000" />
+		<property name="validationQuery" value="SELECT 'x'" />
+		<property name="testOnBorrow" value="false" />
+		<property name="testOnReturn" value="false" />
+		<property name="filters" value="stat" />
+	</bean>
+	
+	<!-- 装配entityManagerFactory -->
+	<bean id="entityManagerFctory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+		<!-- 数据源 -->
+		<property name="dataSource" ref="dataSource"/>
+		<!-- Jpa厂商适配器 -->
+		<property name="jpaVendorAdapter">
+			<bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"/>
+		</property>
+		<!-- Jpa产品实现具体属性 -->
+		<property name="jpaProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+				<prop key="hibernate.show_sql">true</prop>
+				<prop key="hibernate.format_sql">true</prop>
+				<prop key="hibernate.hbm2ddl.auto">update</prop>
+				<prop key="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.EhCacheRegionFactory</prop>
+				<prop key="hibernate.cache.use_second_level_cache">true</prop>
+				<prop key="hibernate.cache.use_query_cache">true</prop>
+			</props>
+		</property>
+		
+		<!-- 配置扫描entity -->
+		<property name="packagesToScan" value="test10.integrate_hibernate_springdata_jpa"/>
+	</bean>
+	
+	
+	<!-- 装配事务管理器 -->
+	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+		<property name="entityManagerFactory" ref="entityManagerFctory"/>
+	</bean>
+	
+	
+	<!-- 配置开启事务注解 -->
+	<tx:annotation-driven transaction-manager="transactionManager"/>
+	
+	
+	<!-- 装配JpaRepository -->
+	<jpa:repositories base-package="test10.integrate_hibernate_springdata_jpa"
+		entity-manager-factory-ref="entityManagerFctory"
+		transaction-manager-ref="transactionManager"
+		repository-impl-postfix="Impl"
+		query-lookup-strategy="create-if-not-found"
+	/>
+</beans>

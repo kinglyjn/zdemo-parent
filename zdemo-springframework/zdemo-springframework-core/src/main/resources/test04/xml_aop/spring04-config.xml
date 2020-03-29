@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+
+
+	<!-- 扫描组件包 -->
+	<context:component-scan base-package="test04.xml_aop"/>
+	
+	
+	<!-- 装配BEANS -->
+	<bean id="caculator" class="test04.xml_aop.CaculatorImpl"/>
+	<bean id="caculatorLoggingAspect" class="test04.xml_aop.CaculatorLoggingAspect"/>
+	<bean id="caculatorValidateAspect" class="test04.xml_aop.CaculatorValidateAspect"/>
+	
+	
+	<!-- 装配切面 -->
+	<aop:config>
+		<!-- 配置切点表达式 -->
+		<aop:pointcut id="pointcut01" expression="execution(* test04.xml_aop.CaculatorImpl.*(..))"/>
+		
+		<!-- 配置切面 -->
+		<aop:aspect ref="caculatorValidateAspect" order="1">
+			<aop:before method="beforeMethod" pointcut-ref="pointcut01"/>
+		</aop:aspect>
+		<aop:aspect ref="caculatorLoggingAspect" order="2">
+			<aop:before method="befreMethod" pointcut-ref="pointcut01"/>
+			<aop:after-returning method="afterReturning" pointcut-ref="pointcut01" returning="result"/>
+			<aop:after-throwing method="afterThrowing" pointcut-ref="pointcut01" throwing="ex"/>
+			<aop:after method="afterMethod" pointcut-ref="pointcut01"/>
+			<!-- 
+			<aop:around method="aroundMethod" pointcut-ref="pointcut01"/>
+		    -->
+		</aop:aspect>
+	</aop:config>
+	
+</beans>
+
+
