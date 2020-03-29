@@ -11,7 +11,9 @@
     <artifactId>zdemo-springframework</artifactId>
     <packaging>pom</packaging>
     <modules>
+        <module>zdemo-springframework-core</module>
         <module>zdemo-springframework-mybatis</module>
+        <module>zdemo-springframework-webmvc</module>
     </modules>
 
 </project>
