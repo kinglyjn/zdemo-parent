@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.keyllo.demo.mybatis.demo01.mapper.UserMapper">
+    <select id="listAll" resultType="com.keyllo.demo.mybatis.demo01.module.User">
+        select * from ttt_user
+    </select>
+
+    <insert id="add" parameterType="com.keyllo.demo.mybatis.demo01.module.User">
+        <selectKey resultType="int" keyProperty="id" order="AFTER">
+            select LAST_INSERT_ID()
+        </selectKey>
+        insert into ttt_user(id, name, password) values(default, #{name}, #{password})
+    </insert>
+
+    <delete id="delete" parameterType="int">
+        delete from ttt_user where id = #{id}
+    </delete>
+</mapper>

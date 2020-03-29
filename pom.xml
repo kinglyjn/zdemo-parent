@@ -9,9 +9,7 @@
     <artifactId>zdemo-parent</artifactId>
     <packaging>pom</packaging>
     <version>1.0</version>
-    <modules>
-        <module>zdemo-core-java</module>
-    </modules>
+
 
     <!--环境参数管理-->
     <properties>
@@ -31,7 +29,19 @@
         <jsp-api.version>2.2</jsp-api.version>
         <fastjson.version>1.2.60</fastjson.version>
         <httpclient.version>4.5.10</httpclient.version>
+        <mybatis-spring.version>2.0.2</mybatis-spring.version>
+        <mybatis.version>3.5.2</mybatis.version>
+        <mysql-connector-java.version>8.0.17</mysql-connector-java.version>
+        <slf4j-api.verison>1.7.26</slf4j-api.verison>
     </properties>
+
+
+    <!--项目聚合管理-->
+    <modules>
+        <module>zdemo-core-java</module>
+        <module>zdemo-springframework</module>
+    </modules>
+
 
     <!--依赖管理-->
     <dependencyManagement>
@@ -68,6 +78,16 @@
                 <artifactId>spring-aop</artifactId>
                 <version>${springframework.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-webmvc</artifactId>
+                <version>${springframework.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-jdbc</artifactId>
+                <version>${springframework.version}</version>
+            </dependency>
 
             <!--aop-->
             <dependency>
@@ -75,6 +95,12 @@
                 <artifactId>aspectjrt</artifactId>
                 <version>${aspectj.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.aspectj</groupId>
+                <artifactId>aspectjweaver</artifactId>
+                <version>${aspectj.version}</version>
+            </dependency>
+
 
             <!--字节码-->
             <dependency>
@@ -95,6 +121,25 @@
                 <artifactId>jsp-api</artifactId>
                 <version>${jsp-api.version}</version>
                 <scope>provided</scope>
+            </dependency>
+
+            <!--jdbc框架-->
+            <dependency>
+                <groupId>org.mybatis</groupId>
+                <artifactId>mybatis-spring</artifactId>
+                <version>${mybatis-spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mybatis</groupId>
+                <artifactId>mybatis</artifactId>
+                <version>${mybatis.version}</version>
+            </dependency>
+
+            <!--jdbc驱动-->
+            <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>${mysql-connector-java.version}</version>
             </dependency>
 
             <!--数据源-->
@@ -121,8 +166,18 @@
 
             <!--日志-->
             <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j-api.verison}</version>
+            </dependency>
+            <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
+                <version>${logback.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-core</artifactId>
                 <version>${logback.version}</version>
             </dependency>
 
