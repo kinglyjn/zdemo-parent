@@ -1,0 +1,65 @@
+
+windows:
+
+    任务管理器可以查看进程和线程，也可以杀死进程
+    tasklist 查看进程
+    taskkill 杀死进程
+
+
+
+linux:
+
+    ps -ef            查看所有进程
+    ps -Tf -p <PID>   查看某个进程的所有线程，也可以使用 top -H -p <PID> 查看某个进程动态线程信息
+    kill              杀死进程
+    top               按大写H切换是否显示线程
+
+
+
+java:
+
+    jps               查看所有java进程
+    jstack <PID>      查看某个java进程的所有线程状态
+
+
+
+
+jconsole 或 jvisualvm:
+
+    // 服务器端
+    需要以如下方式运行你的 java 类：
+    $ java -Djava.rmi.server.hostname=host-rdbms \
+    -Dcom.sun.management.jmxremote \
+    -Dcom.sun.management.jmxremote.port=12345 \
+    -Dcom.sun.management.jmxremote.ssl=false \
+    -Dcom.sun.management.jmxremote.authenticate=false \
+    Hello
+    // 客户端
+    运行jconsole 或 jvisualvm，连接只需要主机和端口（host-rdbms:12345），而不需要输入用户名和密码
+
+
+    如果要认证访问，还需要做如下步骤：
+    // 服务器端
+    $ vim jmxremote.access :
+    kinglyjn readwrite
+
+    $ jmxremote.password
+    kinglyjn 123456
+
+    $ chmod 600 jmxremote.access
+    $ chmod 600 jmxremote.password
+
+    $ java -Djava.rmi.server.hostname=host-rdbms \
+    -Dcom.sun.management.jmxremote \
+    -Dcom.sun.management.jmxremote.port=12345 \
+    -Dcom.sun.management.jmxremote.ssl=false \
+    -Dcom.sun.management.jmxremote.authenticate=true \
+    -Dcom.sun.management.jmxremote.access.file=./jmxremote.access \
+    -Dcom.sun.management.jmxremote.password.file=./jmxremote.password \
+    Hello
+
+    // 客户端
+    运行jconsole 或 jvisualvm，连接需要输入用户名和密码（kinglyjn 123456）
+
+
+
