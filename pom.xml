@@ -25,7 +25,6 @@
         <mybatis.version>3.5.2</mybatis.version>
         <mybatis-spring.version>2.0.2</mybatis-spring.version>
         <druid-spring-boot-starter.version>1.1.14</druid-spring-boot-starter.version>
-        <alibaba-druid.version>1.1.21</alibaba-druid.version>
         <c3p0.version>0.9.1.2</c3p0.version>
         <mysql-connector-java.version>8.0.17</mysql-connector-java.version>
         <springfox-swagger.version>2.9.2</springfox-swagger.version>
@@ -83,19 +82,7 @@
                 <scope>import</scope>
             </dependency>
 
-            <!--druid-->
-            <dependency>
-                <groupId>com.alibaba</groupId>
-                <artifactId>druid-spring-boot-starter</artifactId>
-                <version>${druid-spring-boot-starter.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.alibaba</groupId>
-                <artifactId>druid</artifactId>
-                <version>${alibaba-druid.version}</version>
-            </dependency>
-
-            <!--mybatis-->
+            <!--jdbc框架-->
             <dependency>
                 <groupId>com.baomidou</groupId>
                 <artifactId>mybatis-plus-boot-starter</artifactId>
@@ -111,8 +98,40 @@
                 <artifactId>mybatis-spring</artifactId>
                 <version>${mybatis-spring.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-core</artifactId>
+                <version>${hibernate.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-ehcache</artifactId>
+                <version>${hibernate.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-entitymanager</artifactId>
+                <version>${hibernate.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-validator</artifactId>
+                <version>${hibernate-validator.version}</version>
+            </dependency>
 
-            <!--c3p0-->
+            <!--jdbc驱动-->
+            <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>${mysql-connector-java.version}</version>
+            </dependency>
+
+            <!--数据源-->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>druid-spring-boot-starter</artifactId>
+                <version>${druid-spring-boot-starter.version}</version>
+            </dependency>
             <dependency>
                 <groupId>c3p0</groupId>
                 <artifactId>c3p0</artifactId>
@@ -155,35 +174,6 @@
                 <groupId>javax.servlet</groupId>
                 <artifactId>jstl</artifactId>
                 <version>${javax-servlet-jstl.version}</version>
-            </dependency>
-
-            <!--jdbc框架-->
-            <dependency>
-                <groupId>org.hibernate</groupId>
-                <artifactId>hibernate-core</artifactId>
-                <version>${hibernate.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate</groupId>
-                <artifactId>hibernate-ehcache</artifactId>
-                <version>${hibernate.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate</groupId>
-                <artifactId>hibernate-entitymanager</artifactId>
-                <version>${hibernate.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate</groupId>
-                <artifactId>hibernate-validator</artifactId>
-                <version>${hibernate-validator.version}</version>
-            </dependency>
-
-            <!--jdbc驱动-->
-            <dependency>
-                <groupId>mysql</groupId>
-                <artifactId>mysql-connector-java</artifactId>
-                <version>${mysql-connector-java.version}</version>
             </dependency>
 
             <!--数据解析-->
