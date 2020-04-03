@@ -25,7 +25,7 @@ public class HelloView implements View {
 	@Override
 	public void render(Map<String, ?> model, HttpServletRequest request,
 			HttpServletResponse response) throws Exception {
-		response.getWriter().print("hello view, time is :" + new Date());
+		response.getWriter().print("demo01_hello view, time is :" + new Date());
 	}
 
 }

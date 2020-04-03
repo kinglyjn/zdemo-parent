@@ -157,7 +157,7 @@ public class HttpService {
         CookieStore cookieStore = new BasicCookieStore();
         HttpClient httpClient = HttpClientBuilder.create().setDefaultCookieStore(cookieStore).build();
         // 多次调用
-        HttpGet get = new HttpGet("http://localhost:8912/hello");
+        HttpGet get = new HttpGet("http://localhost:8912/demo01_hello");
         HttpResponse response = httpClient.execute(get);
     }
 

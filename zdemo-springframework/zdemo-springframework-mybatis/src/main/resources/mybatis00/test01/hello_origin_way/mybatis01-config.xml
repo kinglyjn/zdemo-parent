@@ -39,9 +39,9 @@
 	-->
 	<typeAliases>
 		<!-- 定义单个类型的别名 -->
-		<!-- <typeAlias type="mybatis01.hello.User" alias="user"/> -->	
+		<!-- <typeAlias type="mybatis01.demo01_hello.User" alias="user"/> -->
 		<!-- 批量别名的定义: 被扫描包下的类的别名就是 类的非全限名（大小写不敏感） -->
-		<!-- <package name="mybatis01.hello"/> -->
+		<!-- <package name="mybatis01.demo01_hello"/> -->
 	</typeAliases>
 	
 	

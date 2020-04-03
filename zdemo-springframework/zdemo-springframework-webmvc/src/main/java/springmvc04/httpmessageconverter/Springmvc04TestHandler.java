@@ -61,7 +61,7 @@ public class Springmvc04TestHandler {
 	public String test02(@RequestBody String requestBody) {
 		System.out.println(">> springmvc04.httpmessageconverter.Springmvc04TestHandler.test02()");
 		System.out.println(requestBody);
-		return "hello, time is " + new  Date();
+		return "demo01_hello, time is " + new  Date();
 	}
 	
 	/**

@@ -24,10 +24,10 @@ public class HelloTest {
 	}
 	
 	public static void main(String[] args) {
-		//Hello hello = (Hello) ctx.getBean("hello1");
-		//Hello hello = (Hello) ctx.getBean("hello2");
-		//Hello hello = (Hello) ctx.getBean("hello3");
-		//Hello hello = (Hello) ctx.getBean("hello4");
+		//Hello demo01_hello = (Hello) ctx.getBean("hello1");
+		//Hello demo01_hello = (Hello) ctx.getBean("hello2");
+		//Hello demo01_hello = (Hello) ctx.getBean("hello3");
+		//Hello demo01_hello = (Hello) ctx.getBean("hello4");
 	}
 	
 	@Test

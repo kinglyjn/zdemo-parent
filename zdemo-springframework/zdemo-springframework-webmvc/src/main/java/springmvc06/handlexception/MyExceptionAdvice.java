@@ -12,7 +12,7 @@ import org.springframework.web.servlet.ModelAndView;
  * @creation 2017年4月15日 
  * 
  * 其他还有springmvc默认异常处理器，
- * 参见org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver
+ * 参见org.springframework.controller.servlet.mvc.support.DefaultHandlerExceptionResolver
  *
  */
 @ControllerAdvice

@@ -1,0 +1,23 @@
+
+server:
+  port: 8081
+
+spring:
+  application:
+    name: order-service
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://host-rdbms:3306/order-center-db?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8
+    username: root
+    password: 123456
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+  cloud:
+      nacos:
+        discovery:
+          server-addr: host-rdbms:8848
+          # 配置命名空间进行服务的隔离，例如开发和生产服务隔开
+          namespace: 536e9d4c-ba18-42bd-b117-df9c9f89871c
+

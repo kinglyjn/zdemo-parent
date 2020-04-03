@@ -67,7 +67,7 @@ public class Demo01_BaseFunctions {
      */
     @Test
     public void test_predicate_01() {
-        List<String> resultList = filerStr(Arrays.asList("a", "hello", "world"), (v) -> v.length()>2 );
+        List<String> resultList = filerStr(Arrays.asList("a", "demo01_hello", "world"), (v) -> v.length()>2 );
         System.out.println(resultList);
     }
     private List<String> filerStr(List<String> ss, Predicate<String> predicate) {

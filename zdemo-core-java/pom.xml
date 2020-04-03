@@ -50,7 +50,7 @@
             <artifactId>aspectjweaver</artifactId>
         </dependency>
 
-        <!--web-->
+        <!--controller-->
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
@@ -70,6 +70,12 @@
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
+        </dependency>
+
+        <!--mq-->
+        <dependency>
+            <groupId>com.rabbitmq</groupId>
+            <artifactId>amqp-client</artifactId>
         </dependency>
     </dependencies>
 

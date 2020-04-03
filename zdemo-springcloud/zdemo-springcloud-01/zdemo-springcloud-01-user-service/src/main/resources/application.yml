@@ -1,0 +1,67 @@
+
+server:
+  # 服务端口
+  port: 8080
+  servlet:
+    context-path: /user-service
+
+
+spring:
+  # 服务
+  application:
+    name: user-service
+  # 数据库
+  datasource:
+    druid:
+      # 数据源01
+      db01:
+        url: jdbc:mysql://host-rdbms:3306/user-center-db?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        username: root
+        password: 123456
+      # 数据源02
+      db02:
+        url: jdbc:mysql://host-rdbms:3306/user-center-db?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        username: root
+        password: 123456
+      initialSize: 5
+      minIdle: 5
+      maxActive: 20
+  # JSON处理
+  jackson:
+      date-format: yyyy-MM-dd HH:mm:ss
+      time-zone: GMT+8
+  # 服务注册
+  cloud:
+    nacos:
+      discovery:
+        server-addr: host-rdbms:8848
+        namespace: 536e9d4c-ba18-42bd-b117-df9c9f89871c
+
+
+mybatis-plus:
+  # Mapper扫描
+  mapper-locations: classpath:/springcloud01/usercenter/mapper/*Mapper.xml
+  # 实体扫描，多个package用逗号或者分号分隔
+  type-aliases-package: springcloud01.usercenter.module
+  global-config:
+    #主键类型  0:"数据库ID自增", 1:"用户输入ID",2:"全局唯一ID (数字类型唯一ID)", 3:"全局唯一ID UUID";
+    id-type: 0
+    #字段策略 0:"忽略判断",1:"非 NULL 判断"),2:"非空判断"
+    field-strategy: 0
+    #驼峰下划线转换
+    db-column-underline: true
+    #刷新 mapper 调试神器
+    refresh-mapper: true
+    #逻辑删除配置（下面3个配置）
+    logic-delete-value: 0
+    logic-not-delete-value: 1
+  configuration:
+    #配置返回数据库(column下划线命名&&返回java实体是驼峰命名)，自动匹配无需as（没开启这个，SQL需要写as： select user_id as userId）
+    map-underscore-to-camel-case: true
+    cache-enabled: false
+    #配置JdbcTypeForNull, oracle数据库必须配置
+    jdbc-type-for-null: 'null'
+
+

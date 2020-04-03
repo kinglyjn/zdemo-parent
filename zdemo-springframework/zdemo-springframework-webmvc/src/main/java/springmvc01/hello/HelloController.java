@@ -42,7 +42,7 @@ public class HelloController {
 	
 	@RequestMapping("/tohello")
 	public String toHello(Locale locale) {
-		System.out.println(">> springmvc01.hello.HelloController.toHello(Locale)");
+		System.out.println(">> springmvc01.demo01_hello.HelloController.toHello(Locale)");
 		System.out.println(messageResource.getMessage("i18n.username", null, locale));
 		System.out.println(messageResource.getMessage("i18n.password", null, locale));
 		return "springmvc01/springmvc01-main";
@@ -299,7 +299,7 @@ public class HelloController {
 	 * <pre>
 	 * 测试springmvc获取servlet原生API
 	 * 支持的类型见
-	 * org.springframework.web.servlet.mvc.annotation
+	 * org.springframework.controller.servlet.mvc.annotation
 	 * 	.AnnotationMethodHandlerAdapter.ServletHandlerMethodInvoker#resolveStandardArgument方法
 	 * 		HttpServletRequest
 	 * 		HttpServletRequest
@@ -332,7 +332,7 @@ public class HelloController {
 		response.setHeader("Content-Type", "text/html;charset=UTF-8");
 		response.setHeader("Server", "Nginx");
 		response.setCharacterEncoding(request.getCharacterEncoding());
-		writer.write("<h4>hello springmvc!你好！</h4>");
+		writer.write("<h4>demo01_hello springmvc!你好！</h4>");
 	}
 	
 	
@@ -340,7 +340,7 @@ public class HelloController {
 	 * <pre>
 	 * springmvc处理数据模型之 modelAndView（作为返回值）
 	 * springmvc会将modelAndView的model中的数据放到request作用域中
-	 * 参见源码：org.springframework.web.servlet.view.AbstractView#exposeModelAsRequestAttributes
+	 * 参见源码：org.springframework.controller.servlet.view.AbstractView#exposeModelAsRequestAttributes
 	 * </pre>
 	 * 
 	 */
@@ -409,7 +409,7 @@ public class HelloController {
 	 * 工作上，从而实现mvc的充分解耦。
 	 * 
 	 * 视图的作用是渲染模型数据，将模型里的数据以某种形式呈献给客户，为了实现视图模型和具体实现技术的解耦，
-	 * spring在org.springframework.web.servlet包中定义了一个高度抽象的View接口。
+	 * spring在org.springframework.controller.servlet包中定义了一个高度抽象的View接口。
 	 * 视图对象由试图解析器负责实例化。由于视图是无状态的（每一次请求创建新的试图对象），所以他们不会有线
 	 * 程安全的问题。
 	 * 
@@ -456,7 +456,7 @@ public class HelloController {
 	 * <pre>
 	 * 转发测试（默认就是转发，可以不写forward关键字）
 	 * springmvc会在内部自动处理forward和redirect关键字，将他们映射成转发或重定向操作
-	 * 参见org.springframework.web.servlet.view.UrlBasedViewResolver.createView(String, Locale)
+	 * 参见org.springframework.controller.servlet.view.UrlBasedViewResolver.createView(String, Locale)
 	 * </pre>
 	 * 
 	 */

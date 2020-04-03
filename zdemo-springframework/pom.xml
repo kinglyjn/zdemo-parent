@@ -14,6 +14,7 @@
         <module>zdemo-springframework-core</module>
         <module>zdemo-springframework-mybatis</module>
         <module>zdemo-springframework-webmvc</module>
+        <module>zdemo-springframework-amqp</module>
     </modules>
 
 </project>
