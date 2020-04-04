@@ -24,7 +24,7 @@
         <mybatis-plus-boot-starter.verison>3.1.2</mybatis-plus-boot-starter.verison>
         <mybatis.version>3.5.2</mybatis.version>
         <mybatis-spring.version>2.0.2</mybatis-spring.version>
-        <druid-spring-boot-starter.version>1.1.14</druid-spring-boot-starter.version>
+        <druid.version>1.1.14</druid.version>
         <c3p0.version>0.9.1.2</c3p0.version>
         <mysql-connector-java.version>8.0.17</mysql-connector-java.version>
         <springfox-swagger.version>2.9.2</springfox-swagger.version>
@@ -130,7 +130,12 @@
             <dependency>
                 <groupId>com.alibaba</groupId>
                 <artifactId>druid-spring-boot-starter</artifactId>
-                <version>${druid-spring-boot-starter.version}</version>
+                <version>${druid.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>druid</artifactId>
+                <version>${druid.version}</version>
             </dependency>
             <dependency>
                 <groupId>c3p0</groupId>
